@@ -1,0 +1,28 @@
+# Blueprint de Render: crea el servicio web desde el dashboard (New > Blueprint)
+# apuntando a este repositorio. Las variables marcadas con sync: false se piden
+# una sola vez al crear el servicio.
+services:
+  - type: web
+    name: notekeeper
+    runtime: node
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    # El plan gratuito no admite preDeployCommand, así que `prisma db push` vive
+    # dentro del build. Es idempotente: solo aplica diferencias del esquema.
+    # Con un plan de pago, muévelo a preDeployCommand y deja el build en
+    # `npm ci --include=dev && npm run build`.
+    buildCommand: npm ci --include=dev && npm run build && npx prisma db push
+    startCommand: npm start
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: NOTEKEEPER_SECRET_KEY
+        sync: false
+      # Dominios propios (el .onrender.com se acepta solo vía RENDER_EXTERNAL_HOSTNAME)
+      # - key: ALLOWED_HOSTS
+      #   sync: false

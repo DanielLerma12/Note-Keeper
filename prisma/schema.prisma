@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../server/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["notekeeper"]
+}
+
+model notes {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String        @default("")
+  blocks      Json          @default("[]")
+  color       String        @default("default")
+  pinned      Boolean       @default(false)
+  archived    Boolean       @default(false)
+  trashed     Boolean       @default(false)
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  note_labels note_labels[]
+
+  @@index([trashed, archived])
+  @@schema("notekeeper")
+}
+
+model labels {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String        @unique
+  created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  note_labels note_labels[]
+
+  @@schema("notekeeper")
+}
+
+model note_labels {
+  note_id  String @db.Uuid
+  label_id String @db.Uuid
+  position Int    @default(0)
+  note     notes  @relation(fields: [note_id], references: [id], onDelete: Cascade)
+  label    labels @relation(fields: [label_id], references: [id], onDelete: Cascade)
+
+  @@id([note_id, label_id])
+  @@index([label_id])
+  @@schema("notekeeper")
+}
