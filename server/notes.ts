@@ -3,7 +3,7 @@ import { prisma } from './prisma'
 import { decrypt, encrypt } from './crypto'
 import type { Prisma } from './generated/prisma/client'
 
-const COLORS: NoteColor[] = ['default', 'coral', 'peach', 'sand', 'mint', 'sage', 'fog', 'storm', 'dusk', 'blossom', 'clay']
+const COLORS: NoteColor[] = ['default', 'coral', 'peach', 'sand', 'amber', 'olive', 'pine', 'mint', 'sage', 'fog', 'storm', 'indigo', 'violet', 'dusk', 'blossom', 'berry', 'rose', 'clay']
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 const withLabels = { note_labels: { include: { label: true }, orderBy: { position: 'asc' } } } as const

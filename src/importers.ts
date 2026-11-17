@@ -3,7 +3,7 @@ import { parseNoteText, uid } from './noteText'
 
 export const IMPORT_ACCEPT = '.txt,.md,.markdown,.json,text/plain,text/markdown,application/json'
 
-const COLORS: NoteColor[] = ['default', 'coral', 'peach', 'sand', 'mint', 'sage', 'fog', 'storm', 'dusk', 'blossom', 'clay']
+const COLORS: NoteColor[] = ['default', 'coral', 'peach', 'sand', 'amber', 'olive', 'pine', 'mint', 'sage', 'fog', 'storm', 'indigo', 'violet', 'dusk', 'blossom', 'berry', 'rose', 'clay']
 
 const KEEP_COLORS: Record<string, NoteColor> = {
   DEFAULT: 'default',

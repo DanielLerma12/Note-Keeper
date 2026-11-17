@@ -25,7 +25,7 @@
 | 📝 **Notas por bloques**    | Cada nota mezcla texto, listas con checkboxes y bloques de cuenta.                                                                                       |
 | 🔐 **Contraseñas cifradas** | Los campos marcados como secretos se guardan cifrados con AES-256-GCM y solo se muestran cuando los pides; se copian con un clic.                         |
 | 🏷️ **Etiquetas**           | Etiquetas con contador en la barra lateral, además de Archivo y Papelera.                                                                                 |
-| 🎨 **Colores y fijado**     | 11 colores por nota y notas fijadas que aparecen primero en su sección.                                                                                   |
+| 🎨 **Colores y fijado**     | 18 colores por nota y notas fijadas que aparecen primero en su sección.                                                                                   |
 | 🔍 **Búsqueda**             | Filtra al instante por título, texto, campos de cuentas y etiquetas.                                                                                      |
 | 📥 **Importar**             | `.txt`, `.md`, notas de Google Keep (Takeout) y backups propios. Varios archivos a la vez, o arrastrándolos a la ventana; las notas repetidas se ignoran. |
 | 📤 **Exportar**             | Descarga un único JSON con todas las notas, listo para volver a importar.                                                                                 |
