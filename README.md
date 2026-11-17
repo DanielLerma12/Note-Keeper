@@ -1,46 +1,116 @@
+<div align="center">
+
+<img src="public/favicon.svg" alt="Notekeeper" width="72" />
+
 # Notekeeper
 
-A Google Keep–style notes organizer: React + Vite + TypeScript in the browser, and a small API (Hono + Prisma) that stores everything in Supabase, in the `notekeeper` schema.
+**Mis notas, listas y cuentas en un solo lugar:** una alternativa a Google Keep que guarda todo en mi propio Postgres.
 
-- Imports plain text (`.txt`), Markdown (`.md`), Google Keep notes from Google Takeout (`.json`, one per note) and Notekeeper backups (the `.json` that *Export* downloads). Pick or drop several files at once.
-- Each note is split into blocks: accounts (fields with hidden passwords you can show and copy), checklists, and text.
-- Labels, colors, pinned notes, archive, trash, search, and grid or list view.
-- Fields marked as secret are encrypted with AES-256-GCM by the API before they reach the database.
+[![React](https://img.shields.io/badge/React_19-20232A?logo=react&logoColor=61DAFB)](https://react.dev)
+[![Vite](https://img.shields.io/badge/Vite_8-646CFF?logo=vite&logoColor=white)](https://vite.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Hono](https://img.shields.io/badge/Hono_4-E36002?logo=hono&logoColor=white)](https://hono.dev)
+[![Prisma](https://img.shields.io/badge/Prisma_7-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io)
+[![Supabase](https://img.shields.io/badge/Supabase-1C1C1C?logo=supabase&logoColor=3ECF8E)](https://supabase.com)
+[![Render](https://img.shields.io/badge/Render-1C1C1C?logo=render&logoColor=white)](https://render.com)
 
-## Setup
+</div>
 
-`.env.local` (not committed; `.env.example` documents every variable):
+---
 
-```
-DATABASE_URL=...           # Supabase transaction pooler (:6543)
-DIRECT_URL=...             # session pooler (:5432), used by the Prisma CLI
-NOTEKEEPER_SECRET_KEY=...  # 32 bytes in base64; without it the stored passwords can't be read
-```
+## ✨ Qué hace
+
+| | |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📝 **Notas por bloques**    | Cada nota mezcla texto, listas con checkboxes y bloques de cuenta.                                                                                       |
+| 🔐 **Contraseñas cifradas** | Los campos marcados como secretos se guardan cifrados con AES-256-GCM y solo se muestran cuando los pides; se copian con un clic.                         |
+| 🏷️ **Etiquetas**           | Etiquetas con contador en la barra lateral, además de Archivo y Papelera.                                                                                 |
+| 🎨 **Colores y fijado**     | 11 colores por nota y notas fijadas que aparecen primero en su sección.                                                                                   |
+| 🔍 **Búsqueda**             | Filtra al instante por título, texto, campos de cuentas y etiquetas.                                                                                      |
+| 📥 **Importar**             | `.txt`, `.md`, notas de Google Keep (Takeout) y backups propios. Varios archivos a la vez, o arrastrándolos a la ventana; las notas repetidas se ignoran. |
+| 📤 **Exportar**             | Descarga un único JSON con todas las notas, listo para volver a importar.                                                                                 |
+| ↩️ **Deshacer**             | Archivar o mover a la papelera avisa con un botón para revertirlo.                                                                                        |
+| 🔄 **Siempre al día**       | Las notas viven en Postgres; al volver a la pestaña, la lista se refresca desde el servidor.                                                              |
+
+### Bloques de una nota
+
+| Bloque    | Contenido                                                                   |
+| --------- | --------------------------------------------------------------------------- |
+| ✍️ Texto  | Párrafos y líneas sueltas.                                                  |
+| ☑️ Lista  | Elementos con checkbox y título opcional.                                   |
+| 🔑 Cuenta | Pares campo/valor; los marcados como secretos se cifran antes de guardarse. |
+
+---
+
+## 🛠️ Stack
+
+- **Frontend:** React 19 · Vite 8 · TypeScript
+- **Estilos:** CSS propio, sin framework · Figtree y JetBrains Mono
+- **API:** Hono 4 sobre Node, ejecutada con `tsx`
+- **Datos:** Prisma 7 con el driver adapter de `pg`, sobre Postgres (Supabase, esquema `notekeeper`)
+- **Cifrado:** AES-256-GCM con `node:crypto`
+- **Calidad:** Oxlint · `tsc` en modo build
+- **Deploy:** Render (Blueprint) · GitHub
+
+---
+
+## 🚀 Empezar
 
 ```bash
-npm install          # also runs prisma generate
-npm run db:push      # creates or updates the tables in the notekeeper schema
-npm run dev          # Vite on :5173; the API runs inside Vite under /api
-npm run build && npm start   # production build on :3001
+npm install                  # también genera el cliente de Prisma
+cp .env.example .env.local   # y rellena los valores
+npm run db:push              # crea o actualiza las tablas del esquema notekeeper
+npm run dev                  # Vite en localhost:5173; la API corre dentro de Vite bajo /api
 ```
 
-The API has no login and, by default, only listens on `127.0.0.1`: it is meant for your own machine.
+| Variable                 | Para qué                                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`           | Postgres para la app (Supabase transaction pooler, puerto 6543).                                                 |
+| `DIRECT_URL`             | Conexión directa para el CLI de Prisma (Supabase session pooler, puerto 5432).                                   |
+| `NOTEKEEPER_SECRET_KEY`  | 32 bytes en base64. Cifra los campos secretos: si cambia, las contraseñas ya guardadas dejan de descifrarse.      |
+| `HOST`                   | Opcional. `0.0.0.0` en hosting; por defecto escucha en `127.0.0.1`.                                              |
+| `ALLOWED_HOSTS`          | Opcional. Dominios públicos extra para la API, separados por comas.                                              |
 
-## Deploy on Render
+| Comando               | Para qué                                                        |
+| --------------------- | --------------------------------------------------------------- |
+| `npm run dev`         | Desarrollo en `localhost:5173`                                  |
+| `npm run build`       | Build de producción en `dist/`                                  |
+| `npm start`           | Sirve `dist/` y la API en `PORT` (3001 por defecto)             |
+| `npm run lint`        | Oxlint                                                          |
+| `npm run db:push`     | Aplica el esquema a la base de datos                            |
+| `npm run db:generate` | Regenera el cliente de Prisma                                   |
 
-`render.yaml` describes the service as a Blueprint. Before the first deploy:
+---
 
-1. Put the project in a GitHub/GitLab/Bitbucket repository.
-2. Point it at a Postgres database you can reach from Render and run `create schema if not exists notekeeper;` once.
-   Prisma does not create schemas for `multiSchema` projects, so `db push` will fail on a fresh database without it.
-3. In Render, choose **New → Blueprint** and pick the repo. Then fill in `DATABASE_URL`, `DIRECT_URL` and
-   `NOTEKEEPER_SECRET_KEY` (reuse the local key: with a different one the stored passwords become unreadable).
-4. With a custom domain, list it in `ALLOWED_HOSTS` (comma-separated). The `*.onrender.com` subdomain is accepted
-   automatically through `RENDER_EXTERNAL_HOSTNAME`.
+## ☁️ Deploy en Render
 
-The free plan has no `preDeployCommand` and sleeps after ~15 minutes of inactivity, so `prisma db push` runs inside
-the build; on a paid plan move it to `preDeployCommand`.
+`render.yaml` describe el servicio como Blueprint. Antes del primer deploy:
 
-> The API has no authentication. Anyone with the URL can read, edit and delete the notes and see the decrypted
-> passwords, because the server decrypts them when responding; AES only protects them at rest. Put authentication in
-> front before exposing it publicly (Basic Auth in the Hono middleware, or Cloudflare Access).
+1. El proyecto tiene que estar en un repositorio de GitHub, GitLab o Bitbucket.
+2. Apunta el servicio a un Postgres accesible desde Render y ejecuta una vez `create schema if not exists notekeeper;`.
+   Prisma no crea esquemas en proyectos `multiSchema`, así que `db push` falla en una base nueva sin ese paso.
+3. En Render, elige **New → Blueprint** y selecciona el repo. Rellena `DATABASE_URL`, `DIRECT_URL` y
+   `NOTEKEEPER_SECRET_KEY` (reutiliza la clave local: con otra distinta las contraseñas guardadas quedan ilegibles).
+4. Si usas un dominio propio, añádelo a `ALLOWED_HOSTS`. El subdominio `*.onrender.com` se acepta solo, vía
+   `RENDER_EXTERNAL_HOSTNAME`.
+
+El plan gratuito no tiene `preDeployCommand` y el servicio se duerme tras ~15 minutos sin tráfico, así que
+`prisma db push` corre dentro del build; en un plan de pago, muévelo a `preDeployCommand`.
+
+> [!WARNING]
+> La API no tiene autenticación. Cualquiera con la URL puede leer, editar y borrar las notas y ver las contraseñas
+> descifradas, porque el servidor las descifra al responder: AES solo protege los datos en reposo. Antes de exponerla
+> públicamente, ponle delante autenticación (Basic Auth en el middleware de Hono, o Cloudflare Access).
+
+---
+
+## 📁 Estructura
+
+```text
+src/            UI en React (App, hooks y utilidades de notas)
+src/components/ editor, tarjetas, barra de herramientas y toasts
+server/         API en Hono, acceso a datos con Prisma y cifrado
+prisma/         esquema de la base de datos
+public/         favicon
+render.yaml     blueprint del deploy
+```
