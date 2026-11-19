@@ -1365,7 +1365,7 @@ li.done > input {
   font-weight: 700;
 }
 
-.account-name {
+.account-username {
   max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;

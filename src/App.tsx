@@ -180,7 +180,7 @@ export default function App({ session, onSignOut }: { session: SessionInfo; onSi
             <span className="account-avatar" aria-hidden="true">
               {session.user.username.slice(0, 1).toUpperCase()}
             </span>
-            <span className="account-name hide-sm">{session.user.username}</span>
+            <span className="account-username hide-sm">{session.user.username}</span>
             <Icon name="logout" size={18} />
           </button>
           <input
