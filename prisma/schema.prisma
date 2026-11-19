@@ -21,6 +21,10 @@ model users {
   session_limit_minutes  Int?
   session_cooldown_hours Int?
   last_sign_in_at        DateTime? @db.Timestamptz(6)
+  /// Supabase session id of the last sign-in through Notekeeper. Time-limited
+  /// accounts only accept this session, so one requested straight from Supabase
+  /// with the public key is rejected.
+  session_id             String?   @db.Uuid
   notes                  notes[]
   labels                 labels[]
 

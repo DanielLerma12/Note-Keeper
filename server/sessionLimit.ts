@@ -44,3 +44,15 @@ export function formatWait(ms: number) {
   if (minutes === 0) return `${hours} h`
   return `${hours} h ${minutes} min`
 }
+
+/** Reads the `session_id` claim of an access token Supabase just returned. */
+export function sessionIdFromAccessToken(token: string): string | null {
+  try {
+    const payload = token.split('.')[1]
+    if (!payload) return null
+    const json = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as { session_id?: unknown }
+    return typeof json.session_id === 'string' ? json.session_id : null
+  } catch {
+    return null
+  }
+}

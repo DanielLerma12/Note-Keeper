@@ -32,7 +32,7 @@
 | ↩️ **Deshacer**             | Archivar o mover a la papelera avisa con un botón para revertirlo.                                                                                        |
 | 🔄 **Siempre al día**       | Las notas viven en Postgres; al volver a la pestaña, la lista se refresca desde el servidor.                                                              |
 | 👤 **Cuentas**              | Inicio de sesión con las mismas cuentas de Supabase que HobbieVault (usuario o email). Cada cuenta ve solo sus notas y etiquetas.                         |
-| ⏱️ **Sesiones limitadas**   | Una cuenta puede tener sesiones de N minutos y una espera de X horas entre inicios de sesión (la cuenta `tester`: 5 min y 24 h).                           |
+| ⏱️ **Sesiones limitadas**   | Una cuenta puede tener sesiones de N minutos y una espera de X horas entre inicios de sesión (la cuenta `tester`: 5 min y 24 h). Solo vale la sesión abierta desde la app, y la cuenta demo no puede cambiar contraseña, correo ni perfil (`hobbievault/prisma/sql/001_protect_demo_accounts.sql`). |
 
 ### Bloques de una nota
 

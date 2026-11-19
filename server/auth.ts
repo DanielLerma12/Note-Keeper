@@ -3,7 +3,7 @@ import { isAuthRetryableFetchError } from '@supabase/supabase-js'
 import type { Context } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import { prisma } from './prisma'
-import { cooldownRemainingMs, formatWait, readSessionLimit, sessionDeadlineMs } from './sessionLimit'
+import { cooldownRemainingMs, formatWait, readSessionLimit, sessionDeadlineMs, sessionIdFromAccessToken } from './sessionLimit'
 
 // Sign-in works like HobbieVault: the same Supabase accounts and passwords, a
 // row in notekeeper.users decides who can use the app, and the session lives
@@ -72,6 +72,7 @@ type Profile = {
   session_limit_minutes: number | null
   session_cooldown_hours: number | null
   last_sign_in_at: Date | null
+  session_id: string | null
 }
 
 const profileSelect = {
@@ -82,6 +83,7 @@ const profileSelect = {
   session_limit_minutes: true,
   session_cooldown_hours: true,
   last_sign_in_at: true,
+  session_id: true,
 } as const
 
 const profileCache = new Map<string, { value: Profile | null; expiresAtMs: number }>()
@@ -122,8 +124,15 @@ export async function getSessionState(c: Context): Promise<SessionState> {
     return { status: 'none' }
   }
 
-  const deadline = sessionDeadlineMs(claims.amr, readSessionLimit(profile))
+  const limit = readSessionLimit(profile)
+  const deadline = sessionDeadlineMs(claims.amr, limit)
   if (deadline !== null && Date.now() >= deadline) {
+    await endSession(c, supabase)
+    return { status: 'none' }
+  }
+
+  // Time-limited accounts only accept the session Notekeeper itself opened.
+  if (limit && (!profile.session_id || claims.session_id !== profile.session_id)) {
     await endSession(c, supabase)
     return { status: 'none' }
   }
@@ -187,8 +196,17 @@ export async function signIn(c: Context, input: unknown) {
     throw new AuthError(profile ? INVALID_CREDENTIALS : 'This account has no notebook yet', 403)
   }
 
+  const sessionId = sessionIdFromAccessToken(data.session.access_token)
+  if (limit && !sessionId) {
+    await endSession(c, supabase)
+    throw new AuthError("Couldn't start the session. Try again.", 503)
+  }
+
   const now = new Date()
-  await prisma.users.update({ where: { id: profile.id }, data: { last_sign_in_at: now } })
+  await prisma.users.update({
+    where: { id: profile.id },
+    data: { last_sign_in_at: now, session_id: sessionId },
+  })
   profileCache.delete(profile.id)
   setCookie(c, VERSION_COOKIE, String(profile.auth_version), { ...cookieOptions(c), maxAge: 400 * 24 * 3600 })
 
