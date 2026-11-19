@@ -54,3 +54,13 @@ export type View =
   | { kind: 'label'; label: string }
   | { kind: 'archive' }
   | { kind: 'trash' }
+
+export type User = {
+  id: string
+  email: string
+  username: string
+  authVersion: number
+}
+
+/** The signed-in account; sessionEndsAt (ms) is set only for time-limited accounts. */
+export type SessionInfo = { user: User; sessionEndsAt: number | null }

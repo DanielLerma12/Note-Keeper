@@ -23,6 +23,10 @@ services:
         sync: false
       - key: NOTEKEEPER_SECRET_KEY
         sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
       # Dominios propios (el .onrender.com se acepta solo vía RENDER_EXTERNAL_HOSTNAME)
       # - key: ALLOWED_HOSTS
       #   sync: false

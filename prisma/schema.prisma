@@ -8,8 +8,28 @@ datasource db {
   schemas  = ["notekeeper"]
 }
 
+/// One row per Supabase account that can use Notekeeper (the id is auth.users.id).
+/// session_limit_minutes / session_cooldown_hours cap how long a session lasts and
+/// how long the account waits before signing in again (see `npm run session-limit`).
+model users {
+  id                     String    @id @db.Uuid
+  username               String    @unique
+  email                  String    @unique
+  created_at             DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime  @default(now()) @db.Timestamptz(6)
+  auth_version           Int       @default(0) @db.SmallInt
+  session_limit_minutes  Int?
+  session_cooldown_hours Int?
+  last_sign_in_at        DateTime? @db.Timestamptz(6)
+  notes                  notes[]
+  labels                 labels[]
+
+  @@schema("notekeeper")
+}
+
 model notes {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String        @db.Uuid
   title       String        @default("")
   blocks      Json          @default("[]")
   color       String        @default("default")
@@ -18,18 +38,22 @@ model notes {
   trashed     Boolean       @default(false)
   created_at  DateTime      @default(now()) @db.Timestamptz(6)
   updated_at  DateTime      @default(now()) @db.Timestamptz(6)
+  user        users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   note_labels note_labels[]
 
-  @@index([trashed, archived])
+  @@index([user_id, trashed, archived])
   @@schema("notekeeper")
 }
 
 model labels {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String        @unique
+  user_id     String        @db.Uuid
+  name        String
   created_at  DateTime      @default(now()) @db.Timestamptz(6)
+  user        users         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   note_labels note_labels[]
 
+  @@unique([user_id, name])
   @@schema("notekeeper")
 }
 

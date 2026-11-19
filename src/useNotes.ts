@@ -4,34 +4,6 @@ import { api } from './api'
 import { noteToSearchText } from './noteText'
 import { useToast } from './components/toastContext'
 
-const LEGACY_KEY = 'notekeeper.notes.v1'
-
-function readLegacy(): Note[] {
-  try {
-    const raw = localStorage.getItem(LEGACY_KEY)
-    return raw ? (JSON.parse(raw) as Note[]) : []
-  } catch {
-    return []
-  }
-}
-
-function clearLegacy() {
-  try {
-    localStorage.removeItem(LEGACY_KEY)
-  } catch {
-    return
-  }
-}
-
-async function fetchWithMigration() {
-  const remote = await api.list()
-  const legacy = readLegacy()
-  if (remote.length > 0 || legacy.length === 0) return { notes: remote, migrated: 0 }
-  await api.saveMany(legacy)
-  clearLegacy()
-  return { notes: await api.list(), migrated: legacy.length }
-}
-
 export type LoadState = 'loading' | 'ready' | 'error'
 
 export function useNotes() {
@@ -47,15 +19,14 @@ export function useNotes() {
 
   const load = useCallback(
     () =>
-      fetchWithMigration().then(
-        ({ notes: remote, migrated }) => {
+      api.list().then(
+        (remote) => {
           commit(remote)
           setStatus('ready')
-          if (migrated) toast(`${migrated} notes moved from the browser to Supabase`)
         },
         () => setStatus('error'),
       ),
-    [commit, toast],
+    [commit],
   )
 
   useEffect(() => {

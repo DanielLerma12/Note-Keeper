@@ -1334,3 +1334,163 @@ li.done > input {
     opacity: 1;
   }
 }
+
+/* ---------- Account & sign-in ---------- */
+
+.account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin-left: 4px;
+  padding: 0 12px 0 4px;
+  border-radius: 999px;
+  color: var(--muted);
+  transition: background 0.15s, color 0.15s;
+}
+
+.account-btn:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--text);
+}
+
+.account-avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--active);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.account-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.session-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.session-timer.low {
+  background: var(--c-rose);
+  color: var(--text);
+}
+
+.signin-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+.signin-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 400px;
+  padding: 32px 28px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.2s ease;
+}
+
+.signin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.signin-card h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.signin-sub {
+  margin: -10px 0 4px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.signin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.signin-field input,
+.signin-password {
+  height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  transition: border-color 0.15s;
+}
+
+.signin-field input {
+  padding: 0 14px;
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+}
+
+.signin-password {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.signin-password input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: none;
+}
+
+.signin-field input:focus,
+.signin-password:focus-within {
+  border-color: var(--accent);
+}
+
+.signin-password input:focus {
+  border: none;
+}
+
+.signin-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--c-rose) 45%, transparent);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.signin-submit {
+  justify-content: center;
+  margin-top: 4px;
+}

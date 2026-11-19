@@ -54,17 +54,18 @@ export function parseNote(input: unknown): Note {
 
 export class BadRequest extends Error {}
 
-export async function listNotes() {
-  await prisma.labels.deleteMany({ where: { note_labels: { none: {} } } })
-  const rows = await prisma.notes.findMany({ include: withLabels, orderBy: { title: 'asc' } })
+export async function listNotes(userId: string) {
+  await prisma.labels.deleteMany({ where: { user_id: userId, note_labels: { none: {} } } })
+  const rows = await prisma.notes.findMany({ where: { user_id: userId }, include: withLabels, orderBy: { title: 'asc' } })
   return rows.map(toNote)
 }
 
-export async function saveNotes(notes: Note[]) {
+export async function saveNotes(userId: string, notes: Note[]) {
   if (!notes.length) return
   const names = [...new Set(notes.flatMap((n) => n.labels))]
   const rows = notes.map((note) => ({
     id: note.id,
+    user_id: userId,
     title: note.title,
     blocks: mapSecrets(note.blocks, encrypt) as unknown as Prisma.InputJsonValue,
     color: note.color,
@@ -74,15 +75,21 @@ export async function saveNotes(notes: Note[]) {
     created_at: new Date(note.createdAt),
     updated_at: new Date(note.updatedAt),
   }))
+  const ids = rows.map((r) => r.id)
 
   await prisma.$transaction(async (tx) => {
+    const foreign = await tx.notes.count({ where: { id: { in: ids }, user_id: { not: userId } } })
+    if (foreign) throw new BadRequest('Some of these notes belong to another account')
     let labelIds = new Map<string, string>()
     if (names.length) {
-      await tx.labels.createMany({ data: names.map((name) => ({ name })), skipDuplicates: true })
-      const found = await tx.labels.findMany({ where: { name: { in: names } }, select: { id: true, name: true } })
+      await tx.labels.createMany({ data: names.map((name) => ({ user_id: userId, name })), skipDuplicates: true })
+      const found = await tx.labels.findMany({
+        where: { user_id: userId, name: { in: names } },
+        select: { id: true, name: true },
+      })
       labelIds = new Map(found.map((l) => [l.name, l.id]))
     }
-    await tx.notes.deleteMany({ where: { id: { in: rows.map((r) => r.id) } } })
+    await tx.notes.deleteMany({ where: { id: { in: ids }, user_id: userId } })
     await tx.notes.createMany({ data: rows })
     const links = notes.flatMap((note) =>
       note.labels.map((name, position) => ({ note_id: note.id, label_id: labelIds.get(name)!, position })),
@@ -91,12 +98,12 @@ export async function saveNotes(notes: Note[]) {
   })
 }
 
-export async function deleteNote(id: string) {
+export async function deleteNote(userId: string, id: string) {
   if (!UUID.test(id)) throw new BadRequest('Invalid id')
-  await prisma.notes.deleteMany({ where: { id } })
+  await prisma.notes.deleteMany({ where: { id, user_id: userId } })
 }
 
-export async function emptyTrash() {
-  const { count } = await prisma.notes.deleteMany({ where: { trashed: true } })
+export async function emptyTrash(userId: string) {
+  const { count } = await prisma.notes.deleteMany({ where: { user_id: userId, trashed: true } })
   return count
 }

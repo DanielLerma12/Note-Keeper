@@ -31,6 +31,8 @@
 | 📤 **Exportar**             | Descarga un único JSON con todas las notas, listo para volver a importar.                                                                                 |
 | ↩️ **Deshacer**             | Archivar o mover a la papelera avisa con un botón para revertirlo.                                                                                        |
 | 🔄 **Siempre al día**       | Las notas viven en Postgres; al volver a la pestaña, la lista se refresca desde el servidor.                                                              |
+| 👤 **Cuentas**              | Inicio de sesión con las mismas cuentas de Supabase que HobbieVault (usuario o email). Cada cuenta ve solo sus notas y etiquetas.                         |
+| ⏱️ **Sesiones limitadas**   | Una cuenta puede tener sesiones de N minutos y una espera de X horas entre inicios de sesión (la cuenta `tester`: 5 min y 24 h).                           |
 
 ### Bloques de una nota
 
@@ -68,6 +70,8 @@ npm run dev                  # Vite en localhost:5173; la API corre dentro de Vi
 | `DATABASE_URL`           | Postgres para la app (Supabase transaction pooler, puerto 6543).                                                 |
 | `DIRECT_URL`             | Conexión directa para el CLI de Prisma (Supabase session pooler, puerto 5432).                                   |
 | `NOTEKEEPER_SECRET_KEY`  | 32 bytes en base64. Cifra los campos secretos: si cambia, las contraseñas ya guardadas dejan de descifrarse.      |
+| `SUPABASE_URL`           | URL del proyecto de Supabase (el mismo que HobbieVault). Solo la usa el servidor.                                |
+| `SUPABASE_ANON_KEY`      | Clave anon/publishable del proyecto. Solo la usa el servidor.                                                    |
 | `HOST`                   | Opcional. `0.0.0.0` en hosting; por defecto escucha en `127.0.0.1`.                                              |
 | `ALLOWED_HOSTS`          | Opcional. Dominios públicos extra para la API, separados por comas.                                              |
 
@@ -79,6 +83,7 @@ npm run dev                  # Vite en localhost:5173; la API corre dentro de Vi
 | `npm run lint`        | Oxlint                                                          |
 | `npm run db:push`     | Aplica el esquema a la base de datos                            |
 | `npm run db:generate` | Regenera el cliente de Prisma                                   |
+| `npm run session-limit -- <usuario> <min> [horas]` | Limita las sesiones de una cuenta (`<usuario> off` lo quita) |
 
 ---
 
@@ -89,18 +94,21 @@ npm run dev                  # Vite en localhost:5173; la API corre dentro de Vi
 1. El proyecto tiene que estar en un repositorio de GitHub, GitLab o Bitbucket.
 2. Apunta el servicio a un Postgres accesible desde Render y ejecuta una vez `create schema if not exists notekeeper;`.
    Prisma no crea esquemas en proyectos `multiSchema`, así que `db push` falla en una base nueva sin ese paso.
-3. En Render, elige **New → Blueprint** y selecciona el repo. Rellena `DATABASE_URL`, `DIRECT_URL` y
-   `NOTEKEEPER_SECRET_KEY` (reutiliza la clave local: con otra distinta las contraseñas guardadas quedan ilegibles).
+3. En Render, elige **New → Blueprint** y selecciona el repo. Rellena `DATABASE_URL`, `DIRECT_URL`,
+   `NOTEKEEPER_SECRET_KEY` (reutiliza la clave local: con otra distinta las contraseñas guardadas quedan ilegibles),
+   `SUPABASE_URL` y `SUPABASE_ANON_KEY`.
 4. Si usas un dominio propio, añádelo a `ALLOWED_HOSTS`. El subdominio `*.onrender.com` se acepta solo, vía
    `RENDER_EXTERNAL_HOSTNAME`.
 
 El plan gratuito no tiene `preDeployCommand` y el servicio se duerme tras ~15 minutos sin tráfico, así que
 `prisma db push` corre dentro del build; en un plan de pago, muévelo a `preDeployCommand`.
 
-> [!WARNING]
-> La API no tiene autenticación. Cualquiera con la URL puede leer, editar y borrar las notas y ver las contraseñas
-> descifradas, porque el servidor las descifra al responder: AES solo protege los datos en reposo. Antes de exponerla
-> públicamente, ponle delante autenticación (Basic Auth en el middleware de Hono, o Cloudflare Access).
+### Cuentas
+
+Quién puede entrar lo decide la tabla `notekeeper.users` (mismo id que `auth.users`, igual que `hobbievault.users`).
+La sesión vive en cookies `httpOnly` propias (`notekeeper-auth`), así que no se mezcla con la de HobbieVault.
+Cerrar sesión sube `auth_version` y cierra la sesión de Notekeeper en todos los dispositivos.
+`prisma/sql/001_users.sql` es la migración que creó la tabla y pasó las notas existentes a `daniellerma12`.
 
 ---
 
@@ -110,7 +118,7 @@ El plan gratuito no tiene `preDeployCommand` y el servicio se duerme tras ~15 mi
 src/            UI en React (App, hooks y utilidades de notas)
 src/components/ editor, tarjetas, barra de herramientas y toasts
 server/         API en Hono, acceso a datos con Prisma y cifrado
-prisma/         esquema de la base de datos
+prisma/         esquema de la base de datos y migraciones SQL puntuales
 public/         favicon
 render.yaml     blueprint del deploy
 ```

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type DragEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from 'react'
 import { useNotes } from './useNotes'
 import { normalizeQuery, noteToSearchText } from './noteText'
 import { IMPORT_ACCEPT, importFiles } from './importers'
@@ -7,11 +7,11 @@ import { Icon } from './icons'
 import { NoteCard, type NoteHandlers } from './components/NoteCard'
 import { NoteEditor } from './components/NoteEditor'
 import { useToast } from './components/toastContext'
-import type { Note, View } from './types'
+import type { Note, SessionInfo, View } from './types'
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 
-export default function App() {
+export default function App({ session, onSignOut }: { session: SessionInfo; onSignOut: () => void }) {
   const { notes, status, reload, update, add, addMany, remove, emptyTrash } = useNotes()
   const toast = useToast()
   const [view, setView] = useState<View>({ kind: 'notes' })
@@ -169,6 +169,20 @@ export default function App() {
             <Icon name="upload" size={18} />
             <span className="hide-sm">Import</span>
           </button>
+          {session.sessionEndsAt && <SessionTimer endsAt={session.sessionEndsAt} />}
+          <button
+            type="button"
+            className="account-btn"
+            title={`Signed in as ${session.user.username} (${session.user.email}). Click to sign out.`}
+            aria-label={`Sign out ${session.user.username}`}
+            onClick={onSignOut}
+          >
+            <span className="account-avatar" aria-hidden="true">
+              {session.user.username.slice(0, 1).toUpperCase()}
+            </span>
+            <span className="account-name hide-sm">{session.user.username}</span>
+            <Icon name="logout" size={18} />
+          </button>
           <input
             ref={fileInput}
             type="file"
@@ -314,6 +328,22 @@ export default function App() {
         </div>
       )}
     </div>
+  )
+}
+
+function SessionTimer({ endsAt }: { endsAt: number }) {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(id)
+  }, [])
+  const left = Math.max(0, Math.ceil((endsAt - now) / 1000))
+  const label = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`
+  return (
+    <span className={`session-timer${left <= 60 ? ' low' : ''}`} title="Time left in this session" role="timer">
+      <Icon name="timer" size={16} />
+      {label}
+    </span>
   )
 }
 
