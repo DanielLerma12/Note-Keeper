@@ -34,7 +34,6 @@ export function SignIn({ onSignedIn }: { onSignedIn: (session: SessionInfo) => v
           <span className="brand-name">Notekeeper</span>
         </div>
         <h1>Sign in</h1>
-        <p className="signin-sub">Use your HobbieVault username or email.</p>
 
         <label className="signin-field">
           <span>Username or email</span>

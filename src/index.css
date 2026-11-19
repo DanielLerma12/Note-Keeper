@@ -1427,12 +1427,6 @@ li.done > input {
   font-weight: 700;
 }
 
-.signin-sub {
-  margin: -10px 0 4px;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
 .signin-field {
   display: flex;
   flex-direction: column;
