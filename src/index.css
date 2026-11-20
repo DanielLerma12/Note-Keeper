@@ -1020,6 +1020,12 @@ li.done > input {
   font-size: 0.82rem !important;
 }
 
+.field-val.masked {
+  cursor: pointer;
+  user-select: none;
+  letter-spacing: 0.06em;
+}
+
 .field-value-editor {
   display: flex;
   flex: 1;
@@ -1502,4 +1508,58 @@ li.done > input {
 .signin-submit {
   justify-content: center;
   margin-top: 4px;
+}
+
+.reveal-backdrop {
+  z-index: 60;
+}
+
+.reveal-dialog {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  animation: pop 0.18s ease;
+}
+
+.reveal-dialog h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.reveal-dialog p {
+  margin: 0;
+  color: rgb(255 255 255 / 0.7);
+  font-size: 0.9rem;
+}
+
+.reveal-dialog input {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(0 0 0 / 0.25);
+  color: var(--text);
+  font: inherit;
+}
+
+.reveal-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reveal-value input {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.reveal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }

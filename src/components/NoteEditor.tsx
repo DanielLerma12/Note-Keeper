@@ -3,6 +3,8 @@ import type { Block, Field, Note } from '../types'
 import { Icon } from '../icons'
 import { NoteToolbar } from './NoteToolbar'
 import { CopyButton } from './Secret'
+import { useReveal } from './revealContext'
+import { SECRET_MASK } from '../secretMask'
 import { cleanNote, newBlock } from '../noteOps'
 import { isSecretKey, uid } from '../noteText'
 
@@ -124,7 +126,6 @@ type Props = {
 export function NoteEditor({ note, allLabels, onClose, onTrash, onRestore, onDeleteForever }: Props) {
   const [draft, setDraft] = useState(note)
   const [labelInput, setLabelInput] = useState('')
-  const [revealed, setRevealed] = useState<Set<string>>(new Set())
   const draftRef = useRef(draft)
   useLayoutEffect(() => {
     draftRef.current = draft
@@ -162,14 +163,6 @@ export function NoteEditor({ note, allLabels, onClose, onTrash, onRestore, onDel
     setDraft((d) => (d.labels.some((l) => l.toLowerCase() === label.toLowerCase()) ? d : { ...d, labels: [...d.labels, label] }))
     setLabelInput('')
   }
-
-  const toggleReveal = (id: string) =>
-    setRevealed((s) => {
-      const next = new Set(s)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
 
   const readOnly = draft.trashed
 
@@ -223,8 +216,6 @@ export function NoteEditor({ note, allLabels, onClose, onTrash, onRestore, onDel
                   {block.kind === 'account' && (
                     <AccountEditor
                       block={block}
-                      revealed={revealed}
-                      onReveal={toggleReveal}
                       onChange={(next) => setBlock(block.id, () => next)}
                     />
                   )}
@@ -378,17 +369,19 @@ function ChecklistEditor({ block, onChange }: { block: ChecklistBlock; onChange:
 
 function AccountEditor({
   block,
-  revealed,
-  onReveal,
   onChange,
 }: {
   block: AccountBlock
-  revealed: Set<string>
-  onReveal: (id: string) => void
   onChange: (b: AccountBlock) => void
 }) {
+  const reveal = useReveal()
+  // Fields being typed into right now stay visible; masking them mid-typing would cut the input off.
+  const [typing, setTyping] = useState<Set<string>>(new Set())
   const setField = (id: string, patch: Partial<Field>) =>
     onChange({ ...block, fields: block.fields.map((f) => (f.id === id ? { ...f, ...patch } : f)) })
+
+  const revealField = (f: Field) =>
+    reveal({ label: f.key, value: f.value, onChange: (value) => setField(f.id, { value }) })
 
   return (
     <div className="account-editor">
@@ -412,15 +405,17 @@ function AccountEditor({
             />
           </div>
           <div className="field-value-editor">
-            {f.secret && !revealed.has(f.id) ? (
+            {f.secret && f.value && !typing.has(f.id) ? (
               <input
-                className="field-val"
+                className="field-val masked"
                 placeholder="Value"
-                type="password"
+                type="text"
+                readOnly
                 autoComplete="off"
                 spellCheck={false}
-                value={f.value}
-                onChange={(e) => setField(f.id, { value: e.target.value })}
+                value={SECRET_MASK}
+                aria-label={`${f.key || 'Secret'} hidden. Click to show.`}
+                onClick={() => revealField(f)}
               />
             ) : (
               <AccountFieldInput
@@ -428,7 +423,10 @@ function AccountEditor({
                 placeholder="Value"
                 autoComplete="off"
                 value={f.value}
-                onChange={(value) => setField(f.id, { value })}
+                onChange={(value) => {
+                  if (f.secret) setTyping((t) => new Set(t).add(f.id))
+                  setField(f.id, { value })
+                }}
               />
             )}
           </div>
@@ -441,14 +439,9 @@ function AccountEditor({
           >
             <Icon name="shield" size={15} />
           </button>
-          {f.secret && (
-            <button
-              type="button"
-              className="icon-btn tiny"
-              aria-label={revealed.has(f.id) ? 'Hide' : 'Show'}
-              onClick={() => onReveal(f.id)}
-            >
-              <Icon name={revealed.has(f.id) ? 'eyeOff' : 'eye'} size={15} />
+          {f.secret && f.value && (
+            <button type="button" className="icon-btn tiny" aria-label="Show" onClick={() => revealField(f)}>
+              <Icon name="eye" size={15} />
             </button>
           )}
           {f.value && <CopyButton value={f.value} label={f.key} />}

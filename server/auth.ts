@@ -1,5 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
-import { isAuthRetryableFetchError } from '@supabase/supabase-js'
+import { createClient, isAuthRetryableFetchError } from '@supabase/supabase-js'
 import type { Context } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
 import { prisma } from './prisma'
@@ -226,4 +226,25 @@ export async function signOut(c: Context) {
     profileCache.delete(state.user.id)
   }
   await endSession(c, createSupabase(c))
+}
+
+// Re-checks the password of the signed-in user (used before showing a secret).
+// It uses a throwaway Supabase client so the browser session and cookies are
+// left untouched, and closes the extra session it opens.
+export async function verifyPassword(user: AuthUser, input: unknown) {
+  const body = (input ?? {}) as { password?: unknown }
+  const password = typeof body.password === 'string' ? body.password : ''
+  if (!password) throw new AuthError('Enter your password', 400)
+
+  const client = createClient(env('SUPABASE_URL'), env('SUPABASE_ANON_KEY'), {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+  const { data, error } = await client.auth.signInWithPassword({ email: user.email, password })
+  if (error) {
+    if (error.status === 429) throw new AuthError('Too many attempts. Try again in a few minutes.', 429)
+    if (isAuthRetryableFetchError(error)) throw new AuthError("Couldn't reach the server. Try again.", 503)
+    throw new AuthError('Wrong password', 401)
+  }
+  if (data.user.id !== user.id) throw new AuthError('Wrong password', 401)
+  await client.auth.signOut({ scope: 'local' }).catch(() => {})
 }

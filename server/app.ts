@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { AuthError, getSessionState, signIn, signOut, type AuthUser } from './auth'
+import { AuthError, getSessionState, signIn, signOut, verifyPassword, type AuthUser } from './auth'
 import { BadRequest, deleteNote, emptyTrash, listNotes, parseNote, saveNotes } from './notes'
 
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
@@ -50,6 +50,14 @@ app.get('/api/auth/me', async (c) => {
   if (state.status === 'unavailable') return c.json({ error: "Couldn't verify the session" }, 503)
   if (state.status === 'none') return c.json({ error: 'Not signed in' }, 401)
   return c.json({ user: state.user, sessionEndsAt: state.sessionEndsAt })
+})
+
+app.post('/api/auth/verify-password', async (c) => {
+  const state = await getSessionState(c)
+  if (state.status === 'unavailable') return c.json({ error: "Couldn't verify the session" }, 503)
+  if (state.status === 'none') return c.json({ error: 'Not signed in' }, 401)
+  await verifyPassword(state.user, await c.req.json().catch(() => null))
+  return c.json({ ok: true })
 })
 
 app.use('/api/notes/*', async (c, next) => {

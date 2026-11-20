@@ -32,6 +32,9 @@ export const api = {
     request<SessionInfo>('/auth/signin', { method: 'POST', body: JSON.stringify({ identifier, password }) }),
   signOut: () => request<{ ok: true }>('/auth/signout', { method: 'POST', body: '{}' }),
 
+  verifyPassword: (password: string) =>
+    request<{ ok: true }>('/auth/verify-password', { method: 'POST', body: JSON.stringify({ password }) }),
+
   list: () => request<Note[]>('/notes'),
   save: (note: Note) => request<{ ok: true }>(`/notes/${note.id}`, { method: 'PUT', body: JSON.stringify(note) }),
   saveMany: (notes: Note[]) => request<{ ok: true }>('/notes/bulk', { method: 'POST', body: JSON.stringify(notes) }),

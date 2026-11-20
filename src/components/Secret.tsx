@@ -1,5 +1,6 @@
-import { useState } from 'react'
 import { Icon } from '../icons'
+import { SECRET_MASK } from '../secretMask'
+import { useReveal } from './revealContext'
 import { useToast } from './toastContext'
 
 export function CopyButton({ value, label }: { value: string; label: string }) {
@@ -23,22 +24,20 @@ export function CopyButton({ value, label }: { value: string; label: string }) {
 }
 
 export function SecretValue({ value, label }: { value: string; label: string }) {
-  const [shown, setShown] = useState(false)
+  const reveal = useReveal()
   return (
     <span className="secret">
-      <code className={shown ? 'secret-text shown' : 'secret-text'}>
-        {shown ? value : '•'.repeat(Math.min(Math.max(value.length, 6), 14))}
-      </code>
+      <code className="secret-text">{SECRET_MASK}</code>
       <button
         type="button"
         className="icon-btn tiny"
-        aria-label={shown ? 'Hide' : 'Show'}
+        aria-label="Show"
         onClick={(e) => {
           e.stopPropagation()
-          setShown((s) => !s)
+          reveal({ label, value })
         }}
       >
-        <Icon name={shown ? 'eyeOff' : 'eye'} size={15} />
+        <Icon name="eye" size={15} />
       </button>
       <CopyButton value={value} label={label} />
     </span>
