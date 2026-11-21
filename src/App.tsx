@@ -142,9 +142,7 @@ export default function App({ session, onSignOut }: { session: SessionInfo; onSi
           <Icon name="menu" size={22} />
         </button>
         <div className="brand">
-          <span className="brand-icon">
-            <Icon name="notebook" size={22} />
-          </span>
+          <img className="brand-icon" src="/favicon.svg" alt="" />
           <span className="brand-name">{heading}</span>
         </div>
         <label className="search">

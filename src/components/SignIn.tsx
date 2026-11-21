@@ -28,9 +28,7 @@ export function SignIn({ onSignedIn }: { onSignedIn: (session: SessionInfo) => v
     <div className="signin-page">
       <form className="signin-card" onSubmit={submit} noValidate>
         <div className="signin-brand">
-          <span className="brand-icon">
-            <Icon name="notebook" size={22} />
-          </span>
+          <img className="brand-icon" src="/favicon.svg" alt="" />
           <span className="brand-name">Notekeeper</span>
         </div>
         <h1>Sign in</h1>

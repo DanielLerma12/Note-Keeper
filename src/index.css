@@ -244,13 +244,10 @@ a:hover {
 }
 
 .brand-icon {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 38px;
   height: 38px;
   border-radius: 10px;
-  background: var(--accent);
-  color: var(--accent-ink);
   flex-shrink: 0;
 }
 
