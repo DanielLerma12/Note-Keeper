@@ -39,7 +39,6 @@ export function SecretValue({ value, label }: { value: string; label: string }) 
       >
         <Icon name="eye" size={15} />
       </button>
-      <CopyButton value={value} label={label} />
     </span>
   )
 }

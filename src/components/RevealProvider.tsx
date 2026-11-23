@@ -86,14 +86,22 @@ function PasswordPrompt({ label, onCancel, onVerified }: { label: string; onCanc
   )
 }
 
+// Grow the field to fit its text so long values wrap instead of being cut off.
+function fit(el: HTMLTextAreaElement | null) {
+  if (!el) return
+  el.style.height = 'auto'
+  el.style.height = `${el.scrollHeight}px`
+}
+
 function SecretDialog({ request, onClose }: { request: RevealRequest; onClose: () => void }) {
   const [value, setValue] = useState(request.value)
   return (
     <div className="reveal-dialog" role="dialog" aria-modal="true" aria-label={request.label || 'Secret'}>
       <h2>{request.label || 'Secret'}</h2>
       <div className="reveal-value">
-        <input
-          type="text"
+        <textarea
+          ref={fit}
+          rows={1}
           autoComplete="off"
           spellCheck={false}
           readOnly={!request.onChange}
@@ -101,7 +109,9 @@ function SecretDialog({ request, onClose }: { request: RevealRequest; onClose: (
           onChange={(e) => {
             setValue(e.target.value)
             request.onChange?.(e.target.value)
+            fit(e.currentTarget)
           }}
+          onKeyDown={(e) => e.key === 'Enter' && e.preventDefault()}
           onFocus={(e) => e.currentTarget.select()}
         />
         <CopyButton value={value} label={request.label} />

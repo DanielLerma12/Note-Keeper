@@ -38,7 +38,7 @@
   line-height: 1.45;
   color: var(--text);
   background: var(--bg);
-  scrollbar-gutter: stable;
+  scrollbar-gutter: stable both-edges;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -780,6 +780,7 @@ li.done > input {
   letter-spacing: 0.04em;
   overflow-wrap: anywhere;
   white-space: normal;
+  flex: 1;
   min-width: 0;
   color: rgb(255 255 255 / 0.75);
 }
@@ -1400,6 +1401,7 @@ li.done > input {
   display: grid;
   place-items: center;
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 24px 16px;
 }
 
@@ -1534,7 +1536,8 @@ li.done > input {
   font-size: 0.9rem;
 }
 
-.reveal-dialog input {
+.reveal-dialog input,
+.reveal-dialog textarea {
   width: 100%;
   min-width: 0;
   padding: 10px 12px;
@@ -1551,8 +1554,13 @@ li.done > input {
   gap: 8px;
 }
 
-.reveal-value input {
+.reveal-value textarea {
   font-family: 'JetBrains Mono', ui-monospace, monospace;
+  resize: none;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  line-height: 1.4;
 }
 
 .reveal-actions {

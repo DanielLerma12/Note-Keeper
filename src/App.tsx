@@ -11,9 +11,22 @@ import type { Note, SessionInfo, View } from './types'
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`
 
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches)
+  useEffect(() => {
+    const mql = window.matchMedia(query)
+    const onChange = () => setMatches(mql.matches)
+    onChange()
+    mql.addEventListener('change', onChange)
+    return () => mql.removeEventListener('change', onChange)
+  }, [query])
+  return matches
+}
+
 export default function App({ session, onSignOut }: { session: SessionInfo; onSignOut: () => void }) {
   const { notes, status, reload, update, add, addMany, remove, emptyTrash } = useNotes()
   const toast = useToast()
+  const narrow = useMediaQuery('(max-width: 640px)')
   const [view, setView] = useState<View>({ kind: 'notes' })
   const [query, setQuery] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 900)
@@ -141,7 +154,7 @@ export default function App({ session, onSignOut }: { session: SessionInfo; onSi
         <button type="button" className="icon-btn big" aria-label="Main menu" onClick={() => setSidebarOpen((o) => !o)}>
           <Icon name="menu" size={22} />
         </button>
-        <div className="brand">
+        <div className="hide-sm brand">
           <img className="brand-icon" src="/favicon.svg" alt="" />
           <span className="brand-name">{heading}</span>
         </div>
@@ -149,7 +162,7 @@ export default function App({ session, onSignOut }: { session: SessionInfo; onSi
           <Icon name="search" size={20} />
           <input
             type="search"
-            placeholder="Search notes, accounts, labels…"
+            placeholder={narrow ? 'Search notes…' : 'Search notes, accounts, labels…'}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

@@ -444,7 +444,7 @@ function AccountEditor({
               <Icon name="eye" size={15} />
             </button>
           )}
-          {f.value && <CopyButton value={f.value} label={f.key} />}
+          {f.value && !f.secret && <CopyButton value={f.value} label={f.key} />}
           <button
             type="button"
             className="icon-btn tiny"
