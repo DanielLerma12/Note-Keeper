@@ -75,8 +75,9 @@ export function installSwipeToClose() {
     const panel = overlay?.firstElementChild
     if (!overlay || !(panel instanceof HTMLElement)) return
     if (!panel.contains(target)) return
-    if (target.closest('input, textarea, select, [role=slider]')) return
-    if (isScrolledInside(target, overlay)) return
+    const inHeader = target.closest('.editor-head') !== null
+    if (!inHeader && target.closest('input, textarea, select, [role=slider]')) return
+    if (!inHeader && isScrolledInside(target, overlay)) return
 
     const touch = event.touches[0]
     drag = { overlay, panel, startX: touch.clientX, startY: touch.clientY, startedAt: performance.now(), mode: 'pending', dy: 0 }
