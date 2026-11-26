@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { api } from '../api'
+import { backdropClose } from '../backdropClose'
 import { Icon } from '../icons'
 import { CopyButton } from './Secret'
 import { RevealContext, type RevealRequest } from './revealContext'
@@ -26,7 +27,7 @@ export function RevealProvider({ children }: { children: ReactNode }) {
     <RevealContext.Provider value={(request) => setStep({ kind: 'password', request })}>
       {children}
       {step && (
-        <div className="modal-backdrop reveal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && close()}>
+        <div className="modal-backdrop reveal-backdrop" {...backdropClose(close)}>
           {step.kind === 'password' ? (
             <PasswordPrompt label={step.request.label} onCancel={close} onVerified={() => setStep({ kind: 'secret', request: step.request })} />
           ) : (

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type TextareaHTMLAttributes } from 'react'
 import type { Block, Field, Note } from '../types'
 import { Icon } from '../icons'
+import { backdropPress, closeOnBackdropClick } from '../backdropClose'
 import { NoteToolbar } from './NoteToolbar'
 import { CopyButton } from './Secret'
 import { useReveal } from './revealContext'
@@ -167,7 +168,7 @@ export function NoteEditor({ note, allLabels, onClose, onTrash, onRestore, onDel
   const readOnly = draft.trashed
 
   return (
-    <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && close()}>
+    <div className="modal-backdrop" {...backdropPress} onClick={(e) => closeOnBackdropClick(e, close)}>
       <div className={`modal note-card editing c-${draft.color}`} role="dialog" aria-modal="true" aria-label={draft.title || 'Note'}>
         <div className="modal-scroll">
           <div className="editor-head">
