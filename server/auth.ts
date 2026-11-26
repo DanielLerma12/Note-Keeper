@@ -25,7 +25,7 @@ export class AuthError extends Error {
   }
 }
 
-// Own cookie name so the Notekeeper session never collides with HobbieVault's
+// Own cookie name so the NoteKeeper session never collides with HobbieVault's
 // (both apps run on localhost in development, and cookies ignore the port).
 const SESSION_COOKIE = 'notekeeper-auth'
 // The auth_version the session signed in with: signing out bumps it, which ends
@@ -131,7 +131,7 @@ export async function getSessionState(c: Context): Promise<SessionState> {
     return { status: 'none' }
   }
 
-  // Time-limited accounts only accept the session Notekeeper itself opened.
+  // Time-limited accounts only accept the session NoteKeeper itself opened.
   if (limit && (!profile.session_id || claims.session_id !== profile.session_id)) {
     await endSession(c, supabase)
     return { status: 'none' }

@@ -1,7 +1,7 @@
 // npm run session-limit -- <username> <minutes> [cooldownHours]
 // npm run session-limit -- <username> off
 //
-// Caps how long a Notekeeper session lasts for one account and how long it waits
+// Caps how long a NoteKeeper session lasts for one account and how long it waits
 // before it can sign in again (24 h by default). Used for the public tester.
 import { prisma } from '../prisma'
 
@@ -24,7 +24,7 @@ async function main() {
       ? { session_limit_minutes: null, session_cooldown_hours: null }
       : { session_limit_minutes: minutes, session_cooldown_hours: cooldownHours },
   })
-  if (!count) throw new Error(`no Notekeeper user named ${username}`)
+  if (!count) throw new Error(`no NoteKeeper user named ${username}`)
 
   console.log(
     off

@@ -1,6 +1,6 @@
 // Time-limited accounts (the public tester): a session lasts `minutes` from the
 // moment the password was entered, and the account can sign in again only
-// `cooldownHours` after its last Notekeeper sign-in. Same rules as HobbieVault,
+// `cooldownHours` after its last NoteKeeper sign-in. Same rules as HobbieVault,
 // but the limit and the last sign-in live in notekeeper.users so each app
 // keeps its own clock.
 

@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="public/favicon.svg" alt="Notekeeper" width="72" />
+<img src="public/favicon.svg" alt="NoteKeeper" width="72" />
 
-# Notekeeper
+# NoteKeeper
 
 **Mis notas, listas y cuentas en un solo lugar:** una alternativa a Google Keep que guarda todo en mi propio Postgres.
 
@@ -107,7 +107,7 @@ El plan gratuito no tiene `preDeployCommand` y el servicio se duerme tras ~15 mi
 
 Quién puede entrar lo decide la tabla `notekeeper.users` (mismo id que `auth.users`, igual que `hobbievault.users`).
 La sesión vive en cookies `httpOnly` propias (`notekeeper-auth`), así que no se mezcla con la de HobbieVault.
-Cerrar sesión sube `auth_version` y cierra la sesión de Notekeeper en todos los dispositivos.
+Cerrar sesión sube `auth_version` y cierra la sesión de NoteKeeper en todos los dispositivos.
 `prisma/sql/001_users.sql` es la migración que creó la tabla y pasó las notas existentes a `daniellerma12`.
 
 ---

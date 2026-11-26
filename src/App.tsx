@@ -134,7 +134,7 @@ export default function App({ session, onSignOut }: { session: SessionInfo; onSi
   }
 
   const heading =
-    view.kind === 'label' ? view.label : view.kind === 'archive' ? 'Archive' : view.kind === 'trash' ? 'Trash' : 'Notekeeper'
+    view.kind === 'label' ? view.label : view.kind === 'archive' ? 'Archive' : view.kind === 'trash' ? 'Trash' : 'NoteKeeper'
 
   const canCreate = view.kind === 'notes' || view.kind === 'label'
 
@@ -335,7 +335,7 @@ export default function App({ session, onSignOut }: { session: SessionInfo; onSi
       {dragging && (
         <div className="drop-overlay" onDragLeave={() => setDragging(false)}>
           <Icon name="upload" size={56} />
-          <p>Drop .txt, .md, Google Keep or Notekeeper files to import them</p>
+          <p>Drop .txt, .md, Google Keep or NoteKeeper files to import them</p>
         </div>
       )}
     </div>
@@ -388,7 +388,7 @@ function EmptyImport({ onPick, onBlank }: { onPick: () => void; onBlank: () => v
       </div>
       <h1>Your notes, organized</h1>
       <p>
-        Import plain text or Markdown files, notes from Google Keep (Google Takeout), or a Notekeeper backup. Lists,
+        Import plain text or Markdown files, notes from Google Keep (Google Takeout), or a NoteKeeper backup. Lists,
         checkboxes and "Field: value" accounts are recognized, and passwords stay hidden until you ask for them.
       </p>
       <div className="hero-actions">
@@ -401,7 +401,7 @@ function EmptyImport({ onPick, onBlank }: { onPick: () => void; onBlank: () => v
           Blank note
         </button>
       </div>
-      <span className="hint">.txt · .md · Google Keep .json · Notekeeper backup .json. You can also drop files anywhere in the window.</span>
+      <span className="hint">.txt · .md · Google Keep .json · NoteKeeper backup .json. You can also drop files anywhere in the window.</span>
     </div>
   )
 }

@@ -29,7 +29,7 @@ export function SignIn({ onSignedIn }: { onSignedIn: (session: SessionInfo) => v
       <form className="signin-card" onSubmit={submit} noValidate>
         <div className="signin-brand">
           <img className="brand-icon" src="/favicon.svg" alt="" />
-          <span className="brand-name">Notekeeper</span>
+          <span className="brand-name">NoteKeeper</span>
         </div>
         <h1>Sign in</h1>
 
