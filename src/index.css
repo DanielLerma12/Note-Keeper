@@ -1316,6 +1316,16 @@ li.done > input {
     height: 440px;
   }
 
+  .modal {
+    height: min(560px, calc(100dvh - 140px));
+    max-height: none;
+  }
+
+  .modal-scroll {
+    flex: 1;
+    min-height: 0;
+  }
+
   .note-card {
     margin-bottom: 10px;
   }
